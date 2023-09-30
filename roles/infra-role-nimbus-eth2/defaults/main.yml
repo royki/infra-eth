@@ -1,0 +1,121 @@
+---
+nimbus_eth2_service_name: 'nimbus'
+nimbus_eth2_service_path: '/docker/{{ nimbus_eth2_service_name }}'
+nimbus_eth2_compose_path: '{{ nimbus_eth2_service_path }}/docker-compose.yml'
+
+# Container config
+nimbus_eth2_image_tag: 'amd64-v23.9.1'
+nimbus_eth2_image_name: 'statusim/nimbus-eth2:{{ nimbus_eth2_image_tag }}'
+nimbus_eth2_cont_name: '{{ nimbus_eth2_service_name }}-node'
+nimbus_eth2_cont_stop_grace_period: '1m'
+
+# Nimbus dir config
+nimbus_eth2_data_dir: '{{ nimbus_eth2_service_path }}/data'
+nimbus_eth2_secrets_dir: '{{ nimbus_eth2_data_dir }}/secrets'
+nimbus_eth2_validators_dir: '{{ nimbus_eth2_data_dir }}/validators'
+nimbus_eth2_era_dir: '{{ nimbus_eth2_data_dir }}/era'
+
+# Ethereum network
+eth_network: 'mainnet'
+
+# Enabaling history
+nimbus_eth2_history_enabled: true
+nimbus_eth2_history: 'prune'
+nimbus_eth2_nat: '{{ ansible_host }}'
+
+# Logs (https://nimbus.guide/logging.html)
+nimbus_eth2_log_format: 'json'
+# TRACE, DEBUG, INFO, NOTICE ,WARN, ERROR, FATAL, NONE
+nimbus_eth2_log_level: 'INFO'
+
+# Nimbus port
+nimbus_eth2_port: 9000
+
+nimbus_eth2_max_peers: 160
+nimbus_eth2_slashing_db_kind: 'v2'
+
+# JWT secret either give eth1 JWT secret path to copy into eth2 dir or pass eth1 JWT secret directly
+nimbus_eth2_eth1_jwt_secret_enabled: true
+nimbus_eth2_eth1_jwt_secret_path: '{{ nimbus_eth2_secrets_dir }}/jwtsecret'
+# Define path of the eth1 JWT secret if eth1 client is running on same machine
+eth1_jwt_secret_path: '/docker/nethermind/node/keys/jwtsecret'
+# Manually copy jwtsecret here
+nimbus_eth2_eth1_jwt_secret_copied: false
+eth1_jwt_secret: '15547afb5e5cc621ade54c6b00c157d5b39a213fedd87bc80b2ead7baaa530d7'
+
+# Accelerate execution layer sync using light client [=true]
+nimbus_eth2_sync_light_client_enabled: true
+nimbus_eth2_subscribe_all_subnets_enabled: true
+nimbus_eth2_num_threads: 0
+
+nimbus_eth2_netkey_enabled: false
+nimbus_eth2_netkey_file: '{{ nimbus_eth2_data_dir }}/netkey'
+nimbus_eth2_netkey: '{"key":"json1"}'
+# Use pre-generated INSECURE password for network private key file
+nimbus_eth2_insecure_netkey_password_enabled: false
+
+nimbus_eth2_enr_auto_update_enabled: false
+
+# Enable the REST server [=false].
+nimbus_eth2_rest_enabled: true
+nimbus_eth2_rest_address: '0.0.0.0'
+nimbus_eth2_rest_port: 5052
+nimbus_eth2_rest_max_body_size: 16384
+nimbus_eth2_rest_max_headers_size: 128
+nimbus_eth2_rest_statecache_size: 3
+nimbus_eth2_rest_statecache_ttl: 60
+nimbus_eth2_rest_request_timeout: 'infinite'
+# Limit the access to the REST API
+nimbus_eth2_rest_allow_origin: '*'
+
+# Light client data (https://nimbus.guide/light-client-data.html)
+nimbus_eth2_light_client_data_serve_enabled: true
+# only-new(default), none, full, on-demand
+nimbus_eth2_light_client_data_import_mode: 'only-new'
+nimbus_eth2_light_client_data_max_periods: 1 # -1 to use default
+
+nimbus_eth2_doppelganger_detection_enabled: false
+
+# Metrics
+nimbus_eth2_metrics_enabled: false
+nimbus_eth2_metrics_address: '0.0.0.0'
+nimbus_eth2_metrics_port: 9200
+
+# One or more execution layer Engine API URLs
+nimbus_eth2_el_enabled: false
+# Either use el or web3
+nimbus_eth2_el_urls: ['http://127.0.0.1:8545']
+nimbus_eth2_el_web3_url: ['http://127.0.0.1:8545']
+
+# Delay block history backfill
+nimbus_eth2_trusted_node_url_and_backfill_enabled: false
+nimbus_eth2_trusted_node_url: ''
+
+# Validator Monitoring
+nimbus_eth2_validator_monitor_auto_enabled: true
+nimbus_eth2_validator_monitor_details_enabled: false
+# One or more validators to monitor - works best when --subscribe-all-subnets is enabled
+nimbus_eth2_validator_monitor_pubkeys: []
+
+# Fee recipient
+nimbus_eth2_suggested_fee_recipient_enabled: false
+nimbus_eth2_suggested_fee_recipient: '0x0000000000000000000000000000000000000000'
+nimbus_eth2_suggested_gas_limit: 'defaultGasLimit'
+
+# Web3Signer
+nimbus_eth2_web3signer_enabled: true
+nimbus_eth2_web3signer_update_interval: 15
+nimbus_eth2_web3signer_urls: ['http://127.0.0.1:9000']
+
+# Payload
+nimbus_eth2_payload_builder_enabled: true
+nimbus_eth2_payload_builder_url: 'http://127.0.0.1:5051'
+
+# TODO
+# Enable keymanager
+nimbus_eth2_keymanager_enabled: false
+
+# General container management
+compose_recreate: 'smart'
+compose_state: 'present'
+compose_restart: false
