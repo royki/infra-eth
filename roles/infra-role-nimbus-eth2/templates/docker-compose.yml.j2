@@ -15,11 +15,11 @@ services:
       - '{{ nimbus_eth2_rest_port }}:{{ nimbus_eth2_rest_port }}'
 {% endif %}
 {% if nimbus_eth2_metrics_enabled %}
-        - '{{ nimbus_eth2_metrics_port }}: {{ nimbus_eth2_metrics_port }}'
+      - '{{ nimbus_eth2_metrics_port }}:{{ nimbus_eth2_metrics_port }}'
 {% endif %}
     command: >
       --network={{ eth_network }}
-      --data-dir=/home/user/data
+      --data-dir=/home/user/data/beacon_node
       --secrets-dir=/home/user/data/secrets
       --validators-dir=/home/user/data/validators
       --era-dir=/home/user/data/era
@@ -39,7 +39,7 @@ services:
       --jwt-secret=/home/user/data/secrets/jwtsecret
 {% endif %}
 {% if nimbus_eth2_sync_light_client_enabled %}
-      --sync-light-client={{ nimbus_eth2_sync_light_client_enabled |lower}}
+      --sync-light-client={{ nimbus_eth2_sync_light_client_enabled|lower}}
 {% endif %}
 {% if nimbus_eth2_subscribe_all_subnets_enabled %}
       --subscribe-all-subnets={{ nimbus_eth2_subscribe_all_subnets_enabled|lower }}
@@ -49,17 +49,17 @@ services:
       --netkey-file=/home/user/data/netkey
 {% endif %}
 {% if nimbus_eth2_insecure_netkey_password_enabled %}
-      --insecure-netkey-password={{ nimbus_eth2_insecure_netkey_password_enabled |lower }}
+      --insecure-netkey-password={{ nimbus_eth2_insecure_netkey_password_enabled|lower }}
 {% endif %}
 {% if  nimbus_eth2_enr_auto_update_enabled %}
-      --enr-auto-update={{ nimbus_eth2_enr_auto_update_enabled |lower }}
+      --enr-auto-update={{ nimbus_eth2_enr_auto_update_enabled|lower }}
 {% endif %}
 {% if nimbus_eth2_rest_enabled %}
-      --rest={{ nimbus_eth2_rest_enabled |lower }}
+      --rest={{ nimbus_eth2_rest_enabled|lower }}
       --rest-address={{ nimbus_eth2_rest_address }}
       --rest-port={{ nimbus_eth2_rest_port }}
 {% if nimbus_eth2_rest_allow_origin != '' %}
-      --rest-allow-origin={{ nimbus_eth2_rest_allow_origin }}
+      --rest-allow-origin='{{ nimbus_eth2_rest_allow_origin }}'
 {% endif %}
       --rest-max-body-size={{ nimbus_eth2_rest_max_body_size }}
       --rest-max-headers-size={{ nimbus_eth2_rest_max_headers_size }}
@@ -68,13 +68,13 @@ services:
       --rest-request-timeout={{ nimbus_eth2_rest_request_timeout }}
 {% endif %}
 {% if nimbus_eth2_light_client_data_serve_enabled %}
-      --light-client-data-serve={{ nimbus_eth2_light_client_data_serve_enabled |lower }}
+      --light-client-data-serve={{ nimbus_eth2_light_client_data_serve_enabled|lower }}
       --light-client-data-import-mode={{ nimbus_eth2_light_client_data_import_mode }}
 {% if nimbus_eth2_light_client_data_max_periods >= 0 %}
       --light-client-data-max-periods={{ nimbus_eth2_light_client_data_max_periods }}
 {% endif %}
 {% endif %}
-{% if nimbus_eth2_doppelganger_detection_enabled %}
+{% if nimbus_eth2_doppelganger_detection_enabled and not nimbus_eth2_validator_enabled %}
       --doppelganger-detection={{ nimbus_eth2_doppelganger_detection_enabled|lower }}
 {% endif %}
 {% if nimbus_eth2_metrics_enabled %}
@@ -83,7 +83,7 @@ services:
       --metrics-port={{ nimbus_eth2_metrics_port }}
 {% endif %}
 {% if nimbus_eth2_el_enabled %}
-      --no-el={{ nimbus_eth2_el_enabled |lower }}
+      --no-el={{ nimbus_eth2_el_enabled|lower }}
 {% elif nimbus_eth2_el_urls|length > 0 %}
 {% for url in nimbus_eth2_el_urls %}
       --el={{ url }}
@@ -95,7 +95,7 @@ services:
 {% endif %}
 {% if nimbus_eth2_trusted_node_url_and_backfill_enabled %}
       --trusted-node-url={{ nimbus_eth2_trusted_node_url }}
-      --backfill={{ nimbus_eth2_trusted_node_url_and_backfill_enabled |lower }}
+      --backfill={{ nimbus_eth2_trusted_node_url_and_backfill_enabled|lower }}
 {% endif %}
 {% if nimbus_eth2_validator_monitor_auto_enabled %}
       --validator-monitor-auto={{ nimbus_eth2_validator_monitor_auto_enabled|lower }}
@@ -106,19 +106,61 @@ services:
 {% endfor %}
 {% endif %}
 {% endif %}
-{% if nimbus_eth2_suggested_fee_recipient_enabled %}
+{% if not nimbus_eth2_validator_enabled %}
       --suggested-fee-recipient={{ nimbus_eth2_suggested_fee_recipient }}
       --suggested-gas-limit={{ nimbus_eth2_suggested_gas_limit }}
 {% endif %}
+{#
+# TODO: fix it
 {% if nimbus_eth2_web3signer_enabled %}
       --web3signer-update-interval={{ nimbus_eth2_web3signer_update_interval }}
+{% endif %}
+ #}
 {% if nimbus_eth2_web3signer_urls|length > 0 %}
 {% for url in nimbus_eth2_web3signer_urls %}
       --web3-signer-url={{ url }}
 {% endfor %}
 {% endif %}
+{% if nimbus_eth2_payload_builder_enabled %}
+      --payload-builder={{ nimbus_eth2_payload_builder_enabled|lower }}
+      --payload-builder-url={{ nimbus_eth2_payload_builder_url }}
+{% endif %}
+{% if nimbus_eth2_suggested_fee_recipient_enabled and not nimbus_eth2_validator_enabled %}
+      --suggested-fee-recipient={{ nimbus_eth2_suggested_fee_recipient }}
+      --suggested-gas-limit={{ nimbus_eth2_suggested_gas_limit }}
+{% endif %}
+{% if nimbus_eth2_validator_enabled %}
+  nimbus-validator:
+    image: {{ nimbus_eth2_validator_image_name }}
+    container_name: '{{ nimbus_eth2_validator_cont_name }}'
+    user: root
+    restart: 'always'
+    stop_grace_period: '{{ nimbus_eth2_cont_stop_grace_period }}'
+    volumes:
+      - '{{ nimbus_eth2_data_dir }}:/home/user/data:rw'
+{% if nimbus_eth2_metrics_enabled %}
+    ports:
+      - '{{ nimbus_eth2_metrics_port + 1 }}:{{ nimbus_eth2_metrics_port + 1}}'
+{% endif %}
+    command: >
+      --data-dir=/home/user/data/validator_client
+      --secrets-dir=/home/user/data/secrets
+      --validators-dir=/home/user/data/validators
+      --log-format={{ nimbus_eth2_log_format }}
+      --log-level={{ nimbus_eth2_log_level }}
+{% if nimbus_eth2_doppelganger_detection_enabled %}
+      --doppelganger-detection={{ nimbus_eth2_doppelganger_detection_enabled|lower }}
+{% endif %}
+{% if nimbus_eth2_metrics_enabled %}
+      --metrics={{ nimbus_eth2_metrics_enabled|lower }}
+      --metrics-address={{ nimbus_eth2_metrics_address }}
+      --metrics-port={{ nimbus_eth2_metrics_port + 1 }}
 {% endif %}
 {% if nimbus_eth2_payload_builder_enabled %}
-      --payload-builder={{ nimbus_eth2_payload_builder_enabled |lower }}
-      --payload-builder-url={{ nimbus_eth2_payload_builder_url }}
+      --payload-builder={{ nimbus_eth2_payload_builder_enabled|lower }}
+{% endif %}
+{% if nimbus_eth2_suggested_fee_recipient_enabled %}
+      --suggested-fee-recipient={{ nimbus_eth2_suggested_fee_recipient }}
+      --suggested-gas-limit={{ nimbus_eth2_suggested_gas_limit }}
+{% endif %}
 {% endif %}

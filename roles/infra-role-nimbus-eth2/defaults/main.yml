@@ -6,7 +6,7 @@ nimbus_eth2_compose_path: '{{ nimbus_eth2_service_path }}/docker-compose.yml'
 # Container config
 nimbus_eth2_image_tag: 'amd64-v23.9.1'
 nimbus_eth2_image_name: 'statusim/nimbus-eth2:{{ nimbus_eth2_image_tag }}'
-nimbus_eth2_cont_name: '{{ nimbus_eth2_service_name }}-node'
+nimbus_eth2_cont_name: '{{ nimbus_eth2_service_name }}-beacon'
 nimbus_eth2_cont_stop_grace_period: '1m'
 
 # Nimbus dir config
@@ -64,7 +64,7 @@ nimbus_eth2_rest_max_body_size: 16384
 nimbus_eth2_rest_max_headers_size: 128
 nimbus_eth2_rest_statecache_size: 3
 nimbus_eth2_rest_statecache_ttl: 60
-nimbus_eth2_rest_request_timeout: 'infinite'
+nimbus_eth2_rest_request_timeout: 30
 # Limit the access to the REST API
 nimbus_eth2_rest_allow_origin: '*'
 
@@ -74,10 +74,10 @@ nimbus_eth2_light_client_data_serve_enabled: true
 nimbus_eth2_light_client_data_import_mode: 'only-new'
 nimbus_eth2_light_client_data_max_periods: 1 # -1 to use default
 
-nimbus_eth2_doppelganger_detection_enabled: false
+nimbus_eth2_doppelganger_detection_enabled: true
 
 # Metrics
-nimbus_eth2_metrics_enabled: false
+nimbus_eth2_metrics_enabled: true
 nimbus_eth2_metrics_address: '0.0.0.0'
 nimbus_eth2_metrics_port: 9200
 
@@ -98,13 +98,14 @@ nimbus_eth2_validator_monitor_details_enabled: false
 nimbus_eth2_validator_monitor_pubkeys: []
 
 # Fee recipient
-nimbus_eth2_suggested_fee_recipient_enabled: false
+nimbus_eth2_suggested_fee_recipient_enabled: true
 nimbus_eth2_suggested_fee_recipient: '0x0000000000000000000000000000000000000000'
-nimbus_eth2_suggested_gas_limit: 'defaultGasLimit'
+nimbus_eth2_suggested_gas_limit: '8000000000'
 
 # Web3Signer
 nimbus_eth2_web3signer_enabled: true
-nimbus_eth2_web3signer_update_interval: 15
+# TODO: fix it
+# nimbus_eth2_web3signer_update_interval: '15m'
 nimbus_eth2_web3signer_urls: ['http://127.0.0.1:9000']
 
 # Payload
@@ -114,6 +115,16 @@ nimbus_eth2_payload_builder_url: 'http://127.0.0.1:5051'
 # TODO
 # Enable keymanager
 nimbus_eth2_keymanager_enabled: false
+
+#
+# Nimbus validators
+#
+nimbus_eth2_validator_enabled: true
+nimbus_eth2_validator_service_path: '{{ nimbus_eth2_service_path }}/validator'
+
+nimbus_eth2_validator_image_name: 'statusim/nimbus-validator-client:{{ nimbus_eth2_image_tag }}'
+nimbus_eth2_validator_cont_name: '{{ nimbus_eth2_service_name }}-validator'
+
 
 # General container management
 compose_recreate: 'smart'
