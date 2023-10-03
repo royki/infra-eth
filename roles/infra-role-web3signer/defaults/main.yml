@@ -1,0 +1,105 @@
+---
+# Web3signer
+web3signer_service_name: 'web3signer'
+web3signer_service_path: '/docker/{{ web3signer_service_name }}'
+web3signer_compose_path: '{{ web3signer_service_path }}/docker-compose.yml'
+
+# Container config
+web3signer_image_tag: '23.9'
+web3signer_image_name: 'consensys/web3signer:{{ web3signer_image_tag }}'
+web3signer_cont_name: '{{ web3signer_service_name }}'
+web3signer_cont_stop_grace_period: '1m'
+# service_started, service_healthy, healthcheck, service_completed_successfully
+web3signe_cont_conditions: ['service_started', 'service_healthy', 'healthcheck', 'service_completed_successfully']
+
+# web3signer dir config
+web3signer_config_dir: '{{ web3signer_service_path }}/config'
+web3signer_keystore_dir: '{{ web3signer_config_dir }}/keys'
+web3signer_keystore_file_max_size: 158000000
+web3signer_migrated_data_dir: '{{ web3signer_service_path }}/migrations'
+# web3signer ports
+web3signer_http_listen_port: 9000
+web3signer_http_listen_host: '0.0.0.0'
+web3signer_http_host_allowlist: '*'
+# Logs
+# OFF, FATAL, ERROR, WARN, INFO, DEBUG, TRACE, ALL
+web3signer_logging_enabled: 'INFO'
+# metrics
+web3signer_metrics_enabled: true
+web3signer_metrics_host: '0.0.0.0'
+web3signer_metrics_port: 9001
+web3signer_metrics_categories: ['HTTP','SIGNING','PROCESS','ETH2_SLASHING_PROTECTION']
+web3signer_metrics_host_allowlist: ['127.0.0.1']
+web3signer_idle_connection_timeout_seconds: 30
+
+web3signer_swagger_ui_enabled: false
+# TODO
+# tls keystore
+# web3signer_tls_keystore_file:
+# web3signer_tls_keystore_password_file:
+# can't use this option with --tls-allow-ca-clients and --tls-known-clients-file
+# web3signer_tls_allow_any_client:
+# web3signer_tls_known_client_file:
+# web3signer_tls_allow_ca_clients:
+
+# Postgres db
+web3signer_pg_service_name: 'postgres'
+web3signer_pg_service_path: '{{ web3signer_service_path }}/{{ web3signer_pg_service_name }}'
+web3signer_pg_image_tag: '14'
+web3signer_pg_image_name: 'bitnami/postgresql:{{ web3signer_pg_image_tag }}'
+web3signer_pg_cont_name: '{{ web3signer_pg_service_name }}'
+web3signer_pg_cont_stop_grace_period: '1m'
+web3signer_pg_host: 'db' # postgresql service name
+web3signer_pg_port: 5432
+web3signer_pg_user: 'postgres' # Update
+web3signer_pg_password: 'postgres' # Update
+web3signer_pg_database: '{{ web3signer_service_name }}'
+
+# Flyway db
+web3signer_pg_flyway_service_name: 'flyway'
+web3signer_pg_flyway_image_tag: '9'
+web3signer_pg_flyway_image_name: 'flyway/flyway:{{ web3signer_pg_flyway_image_tag }}'
+web3signer_pg_flyway_cont_name: '{{ web3signer_pg_flyway_service_name }}'
+web3signer_pg_flyway_connect: 'connectRetries=60'
+web3signer_pg_config_file: '.postgesql.env'
+web3signer_pg_flyway_migrate_command: >-
+  migrate
+  -url=jdbc:postgresql://{{ web3signer_pg_host }}:{{ web3signer_pg_port }}/{{ web3signer_pg_database }}
+  -user={{ web3signer_pg_user }}
+  -password={{ web3signer_pg_password }}
+  -{{ web3signer_pg_flyway_connect }}
+
+w33signer_slashing_protection_enabled: true
+w33signer_slashing_protection_pruning_at_boot_enabled: true
+w33signer_slashing_protection_pruning_epochs_to_keep: 250
+w33signer_slashing_protection_pruning_interval: 24
+w33signer_slashing_protection_pruning_slots_per_epoch: 32
+w33signer_slashing_protection_health_check_interval_milliseconds: 20000
+w33signer_slashing_protection_health_check_timeout_milliseconds: 5000
+web3signer_config_options:
+  eth2:
+    - 'slashing-protection-enabled: {{ w33signer_slashing_protection_enabled|lower }}'
+    - "slashing-protection-db-url: 'jdbc:postgresql://{{ web3signer_pg_host }}/{{ web3signer_pg_database }}'"
+    - 'slashing-protection-db-username: {{ web3signer_pg_user }}'
+    - 'slashing-protection-db-password: {{ web3signer_pg_password }}'
+    - 'slashing-protection-pruning-at-boot-enabled: {{ w33signer_slashing_protection_pruning_at_boot_enabled|lower }}'
+    - 'slashing-protection-pruning-epochs-to-keep: {{ w33signer_slashing_protection_pruning_epochs_to_keep }}'
+    - 'slashing-protection-pruning-interval: {{ w33signer_slashing_protection_pruning_interval }}'
+    - 'slashing-protection-pruning-slots-per-epoch: {{ w33signer_slashing_protection_pruning_slots_per_epoch }}'
+    - 'slashing-protection-db-health-check-interval-milliseconds: {{ w33signer_slashing_protection_health_check_interval_milliseconds }}'
+    - 'slashing-protection-db-health-check-timeout-milliseconds: {{ w33signer_slashing_protection_health_check_timeout_milliseconds }}'
+
+# Ethereum layer eth1 or eth2
+ethereum_layer_name: eth2
+
+# web3signer keys
+web3signer_keys: {}
+  # key-1:
+  #   type: 'file-raw'
+  #   keyType: 'BLS'
+  #   privateKey: '0x25b1166a43c109cb330af8945d364722757c65ed2bfed5444b5a2f057f82d391'
+
+# General container management
+compose_recreate: 'smart'
+compose_state: 'present'
+compose_restart: false

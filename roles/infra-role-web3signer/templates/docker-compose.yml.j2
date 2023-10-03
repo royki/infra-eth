@@ -1,0 +1,77 @@
+version: '3'
+services:
+{% if  w33signer_slashing_protection_enabled %}
+  web3signer-migrations:
+    image: '{{ web3signer_image_name }}'
+    container_name: '{{ web3signer_cont_name }}-migrations'
+    user: root
+    stop_grace_period: '{{ web3signer_cont_stop_grace_period }}'
+    volumes:
+      - {{ web3signer_migrated_data_dir }}:/flyway/sql
+    entrypoint: ["sh", "-c", "cp /opt/web3signer/migrations/postgresql/*.sql /flyway/sql/; echo 'sql files copied!'"]
+
+  db:
+    image: '{{ web3signer_pg_image_name }}'
+    container_name: '{{ web3signer_pg_cont_name }}'
+    user: root
+    stop_grace_period: '{{ web3signer_cont_stop_grace_period }}'
+    restart: 'always'
+    env_file:
+      - {{ web3signer_pg_config_file }}
+    ports:
+      - '{{ web3signer_pg_port }}:{{ web3signer_pg_port }}'
+    volumes:
+      - postgresql_data:/bitnami/postgresql
+    depends_on:
+      web3signer-migrations:
+        condition: {{ web3signe_cont_conditions[3] }}
+    networks:
+      - {{ web3signer_service_name }}
+
+  web3signer-flyway:
+    image: '{{ web3signer_pg_flyway_image_name }}'
+    container_name: '{{ web3signer_pg_flyway_service_name }}'
+    user: root
+    stop_grace_period: '{{ web3signer_cont_stop_grace_period }}'
+    command: {{ web3signer_pg_flyway_migrate_command | trim }}
+    env_file:
+      - {{ web3signer_pg_config_file }}
+    volumes:
+      - {{ web3signer_migrated_data_dir }}:/flyway/sql:ro
+    depends_on:
+      db:
+        condition: {{ web3signe_cont_conditions[0] }}
+      web3signer-migrations:
+        condition: {{ web3signe_cont_conditions[3] }}
+    networks:
+      - {{ web3signer_service_name }}
+{% endif %}
+  web3signer:
+    image: {{ web3signer_image_name}}
+    container_name: '{{ web3signer_service_name }}'
+    user: root
+    stop_grace_period: '{{ web3signer_cont_stop_grace_period }}'
+    restart: 'always'
+    command: >
+      --config-file=/var/config/config.yml {{ ethereum_layer_name }}
+    volumes:
+      - {{ web3signer_config_dir }}:/var/config
+    ports:
+      - '{{ web3signer_http_listen_port }}:{{ web3signer_http_listen_port }}'
+      - '{{ web3signer_metrics_port }}:{{ web3signer_metrics_port }}'
+{% if  w33signer_slashing_protection_enabled %}
+    depends_on:
+      web3signer-flyway:
+        condition: {{ web3signe_cont_conditions[3] }}
+    networks:
+      - {{ web3signer_service_name }}
+{% endif %}
+
+{% if  w33signer_slashing_protection_enabled %}
+volumes:
+  postgresql_data:
+
+networks:
+  {{ web3signer_service_name}}:
+    name: {{ ethereum_layer_name }}
+{% endif %}

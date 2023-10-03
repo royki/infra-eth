@@ -1,0 +1,17 @@
+---
+- name: web3signer | Create docker compose file
+  template:
+    src: 'docker-compose.yml.j2'
+    dest: '{{ web3signer_compose_path }}'
+    owner: 'dockremap'
+    group: 'docker'
+    mode: 0640
+
+- name: web3signer | Create containers
+  docker_compose:
+    project_src: '{{ web3signer_service_path }}'
+    state: '{{ compose_state }}'
+    restarted: '{{ compose_restart }}'
+    recreate: '{{ compose_recreate | default("smart") }}'
+    pull: true
+    build: false

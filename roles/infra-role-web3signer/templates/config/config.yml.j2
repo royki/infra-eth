@@ -1,0 +1,48 @@
+---
+http-listen-host: '{{ web3signer_http_listen_host }}'
+http-listen-port: {{ web3signer_http_listen_port }}
+{% if  web3signer_http_host_allowlist == '*' %}
+http-host-allowlist: '{{ web3signer_http_host_allowlist }}'
+{% else %}
+http-host-allowlist: [{{ web3signer_http_host_allowlist|map('to_json')|join(',') }}]
+{% endif %}
+{% if  keys_files_found.matched != 0 %}
+key-config-path: /var/config/keys
+key-store-config-file-max-size: {{ web3signer_keystore_file_max_size }}
+{% endif %}
+logging: {{ web3signer_logging_enabled }}
+metrics-enabled: {{ web3signer_metrics_enabled|lower }}
+metrics-host: "{{ web3signer_metrics_host }}"
+metrics-port: {{ web3signer_metrics_port }}
+metrics-categories: [{{ web3signer_metrics_categories|map('to_json')|join(',') }}]
+{% if web3signer_metrics_host_allowlist == '*' %}
+metrics-host-allowlist: '{{ web3signer_metrics_host_allowlist }}'
+{% else %}
+metrics-host-allowlist: [{{ web3signer_metrics_host_allowlist|map('to_json')|join(',') }}]
+{% endif %}
+idle-connection-timeout-seconds: {{ web3signer_idle_connection_timeout_seconds }}
+swagger-ui-enabled: {{ web3signer_swagger_ui_enabled|lower }}
+{% if web3signer_tls_keystore_file is defined %}
+tls-keystore-file: {{ web3signer_tls_keystore_file }}
+{% endif %}
+{% if web3signer_tls_keystore_password_file is defined %}
+tls-keystore-password-file: {{ web3signer_tls_keystore_password_file }}
+{% endif %}
+{% if web3signer_tls_allow_any_client is defined %}
+tls-allow-any-client: {{ web3signer_tls_allow_any_client | to_json }}
+{% endif %}
+{% if web3signer_tls_known_client_file is defined %}
+tls-known-clients-file: '{{ web3signer_tls_known_client_file }}'
+{% endif %}
+{% if web3signer_tls_allow_ca_clients is defined %}
+tls-allow-ca-clients: '{{ web3signer_tls_allow_ca_clients }}'
+{% endif %}
+
+{% if w33signer_slashing_protection_enabled %}
+{% for key in web3signer_config_options[ethereum_layer_name] %}
+{{ ethereum_layer_name }}.{{ key }}
+{% endfor %}
+{% else %}
+eth2.slashing-protection-enabled: {{ w33signer_slashing_protection_enabled|lower }}
+{% endif %}
+

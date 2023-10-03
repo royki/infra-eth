@@ -1,0 +1,14 @@
+---
+
+- name: web3signer | Check the application status - when TLS keystore is not set
+  uri:
+    url: "http://127.0.0.1:{{ web3signer_http_listen_port }}/upcheck"
+    status_code: [200]
+    return_content: true
+  when: "web3signer_tls_keystore_file is not defined"
+  register: _result
+  until:
+    - "_result.content is defined"
+    - "_result.content == 'OK'"
+  retries: 12
+  delay: 5

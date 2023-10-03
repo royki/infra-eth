@@ -1,0 +1,58 @@
+---
+
+- name: web3signer | Create container directories
+  file:
+    path: '{{ item }}'
+    owner: dockremap
+    group: docker
+    state: directory
+    mode: 0700
+  with_items:
+    - '{{ web3signer_service_path }}'
+    - '{{ web3signer_migrated_data_dir }}'
+    - '{{ web3signer_config_dir }}'
+    - '{{ web3signer_keystore_dir }}'
+
+- name: web3signer | Create db .env file
+  template:
+    src: 'env/.postgesql.env.j2'
+    dest: '{{ web3signer_service_path }}/.postgesql.env'
+    owner: 'dockremap'
+    group: 'docker'
+    mode: 0640
+
+- name: web3signer | Configure validator key files
+  template:
+    src: 'config/key.yml.j2'
+    dest: '{{ web3signer_keystore_dir }}/{{ item }}.yml'
+    owner: 'dockremap'
+    group: 'docker'
+    mode: 0400
+  with_items: '{{ web3signer_keys | flatten(levels=1) }}'
+  when: web3signer_keys | length > 0
+
+- name: web3signer | Copy validator key files
+  copy:
+    src: '{{ item }}'
+    dest: '{{ web3signer_keystore_dir }}'
+    owner: 'dockremap'
+    group: 'docker'
+    mode: 0400
+  with_fileglob: 'keys/*.yml'
+  when: web3signer_keys == {} and item != '*.yml'
+
+- name: web3signer| keys files in directory
+  find:
+    paths: '{{ web3signer_keystore_dir }}'
+    patterns: '*.yml'
+    recurse: true
+    file_type: file
+  register: keys_files_found
+
+- name: web3signer | Create config file
+  template:
+    src: 'config/config.yml.j2'
+    dest: '{{ web3signer_config_dir }}/config.yml'
+    owner: 'dockremap'
+    group: 'docker'
+    mode: 0640
