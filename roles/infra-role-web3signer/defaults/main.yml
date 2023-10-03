@@ -69,25 +69,25 @@ web3signer_pg_flyway_migrate_command: >-
   -password={{ web3signer_pg_password }}
   -{{ web3signer_pg_flyway_connect }}
 
-w33signer_slashing_protection_enabled: true
-w33signer_slashing_protection_pruning_at_boot_enabled: true
-w33signer_slashing_protection_pruning_epochs_to_keep: 250
-w33signer_slashing_protection_pruning_interval: 24
-w33signer_slashing_protection_pruning_slots_per_epoch: 32
-w33signer_slashing_protection_health_check_interval_milliseconds: 20000
-w33signer_slashing_protection_health_check_timeout_milliseconds: 5000
+web3signer_slashing_protection_enabled: true
+web3signer_slashing_protection_pruning_at_boot_enabled: true
+web3signer_slashing_protection_pruning_epochs_to_keep: 250
+web3signer_slashing_protection_pruning_interval: 24
+web3signer_slashing_protection_pruning_slots_per_epoch: 32
+web3signer_slashing_protection_health_check_interval_milliseconds: 20000
+web3signer_slashing_protection_health_check_timeout_milliseconds: 5000
 web3signer_config_options:
   eth2:
-    - 'slashing-protection-enabled: {{ w33signer_slashing_protection_enabled|lower }}'
+    - 'slashing-protection-enabled: {{ web3signer_slashing_protection_enabled|lower }}'
     - "slashing-protection-db-url: 'jdbc:postgresql://{{ web3signer_pg_host }}/{{ web3signer_pg_database }}'"
     - 'slashing-protection-db-username: {{ web3signer_pg_user }}'
     - 'slashing-protection-db-password: {{ web3signer_pg_password }}'
-    - 'slashing-protection-pruning-at-boot-enabled: {{ w33signer_slashing_protection_pruning_at_boot_enabled|lower }}'
-    - 'slashing-protection-pruning-epochs-to-keep: {{ w33signer_slashing_protection_pruning_epochs_to_keep }}'
-    - 'slashing-protection-pruning-interval: {{ w33signer_slashing_protection_pruning_interval }}'
-    - 'slashing-protection-pruning-slots-per-epoch: {{ w33signer_slashing_protection_pruning_slots_per_epoch }}'
-    - 'slashing-protection-db-health-check-interval-milliseconds: {{ w33signer_slashing_protection_health_check_interval_milliseconds }}'
-    - 'slashing-protection-db-health-check-timeout-milliseconds: {{ w33signer_slashing_protection_health_check_timeout_milliseconds }}'
+    - 'slashing-protection-pruning-at-boot-enabled: {{ web3signer_slashing_protection_pruning_at_boot_enabled|lower }}'
+    - 'slashing-protection-pruning-epochs-to-keep: {{ web3signer_slashing_protection_pruning_epochs_to_keep }}'
+    - 'slashing-protection-pruning-interval: {{ web3signer_slashing_protection_pruning_interval }}'
+    - 'slashing-protection-pruning-slots-per-epoch: {{ web3signer_slashing_protection_pruning_slots_per_epoch }}'
+    - 'slashing-protection-db-health-check-interval-milliseconds: {{ web3signer_slashing_protection_health_check_interval_milliseconds }}'
+    - 'slashing-protection-db-health-check-timeout-milliseconds: {{ web3signer_slashing_protection_health_check_timeout_milliseconds }}'
 
 # Ethereum layer eth1 or eth2
 ethereum_layer_name: eth2
