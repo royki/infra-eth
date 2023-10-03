@@ -15,17 +15,24 @@ This role configures [web3signer](https://docs.web3signer.consensys.net/) using 
 ### Configuration
 
 - Enable slashing protection: `web3signer_slashing_protection_enabled: true`
-- Add keys to files (`files/keys/`) or provide keys as variable
+- Add keys to files (`files/keys/keys-1.yaml`), keys file extension should be `.yaml`. web3signer can't load `.yml` extension
+- or Provide keys as variable
   - Ref: [web3signer keyfile](https://docs.web3signer.consensys.net/reference/key-config-file-params)
 
   - Example of key file content
 
   ```yml
-  key-1:
-    type: 'file-raw'
-    keyType: 'BLS'
-    privateKey: '0x25b1166a43c109cb330af8945d364722757c65ed2bfed5444b5a2f057f82d391'
+  web3signer_keys:
+    key-1:
+      type: 'file-raw'
+      keyType: 'BLS'
+      privateKey: '0x25b1166a43c109cb330af8945d364722757c65ed2bfed5444b5a2f057f82d391'
   ```
+
+- Check web3signer is up and running via API
+  - [REST API](https://docs.web3signer.consensys.net/reference/api/rest)
+  - Health Check - `curl -X GET http://127.0.0.1:9000/healthcheck`
+  - List of public keys - `curl -X GET http://127.0.0.1:9000/api/v1/eth2/publicKeys`
 
 ### Playbook example
 
@@ -36,6 +43,13 @@ This role configures [web3signer](https://docs.web3signer.consensys.net/) using 
   become: true
   roles:
     - {role: infra-role-web3signer}
+  vars:
+    web3signer_keys:
+      key-1:
+        type: 'file-raw'
+        keyType: 'BLS'
+        privateKey: '0x25b1166a43c109cb330af8945d364722757c65ed2bfed5444b5a2f057f82d391'
+
 ```
 
 ---

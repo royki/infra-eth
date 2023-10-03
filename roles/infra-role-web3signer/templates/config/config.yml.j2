@@ -38,11 +38,11 @@ tls-known-clients-file: '{{ web3signer_tls_known_client_file }}'
 tls-allow-ca-clients: '{{ web3signer_tls_allow_ca_clients }}'
 {% endif %}
 
-{% if w33signer_slashing_protection_enabled %}
+{% if web3signer_slashing_protection_enabled %}
 {% for key in web3signer_config_options[ethereum_layer_name] %}
 {{ ethereum_layer_name }}.{{ key }}
 {% endfor %}
 {% else %}
-eth2.slashing-protection-enabled: {{ w33signer_slashing_protection_enabled|lower }}
+eth2.slashing-protection-enabled: {{ web3signer_slashing_protection_enabled|lower }}
 {% endif %}
 

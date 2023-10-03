@@ -21,10 +21,10 @@
     group: 'docker'
     mode: 0640
 
-- name: web3signer | Configure validator key files
+- name: web3signer | Create validator key files
   template:
     src: 'config/key.yml.j2'
-    dest: '{{ web3signer_keystore_dir }}/{{ item }}.yml'
+    dest: '{{ web3signer_keystore_dir }}/{{ item }}.yaml'
     owner: 'dockremap'
     group: 'docker'
     mode: 0400
@@ -38,13 +38,13 @@
     owner: 'dockremap'
     group: 'docker'
     mode: 0400
-  with_fileglob: 'keys/*.yml'
-  when: web3signer_keys == {} and item != '*.yml'
+  with_fileglob: 'keys/*.yaml'
+  when: web3signer_keys == {} and item != '*.yaml'
 
-- name: web3signer| keys files in directory
+- name: web3signer| Check for validator keys files in directory
   find:
     paths: '{{ web3signer_keystore_dir }}'
-    patterns: '*.yml'
+    patterns: '*.yaml'
     recurse: true
     file_type: file
   register: keys_files_found
