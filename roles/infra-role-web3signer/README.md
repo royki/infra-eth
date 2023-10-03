@@ -25,7 +25,6 @@ This role configures [web3signer](https://docs.web3signer.consensys.net/) using 
     type: 'file-raw'
     keyType: 'BLS'
     privateKey: '0x25b1166a43c109cb330af8945d364722757c65ed2bfed5444b5a2f057f82d391'
-
   ```
 
 ### Playbook example
@@ -38,3 +37,10 @@ This role configures [web3signer](https://docs.web3signer.consensys.net/) using 
   roles:
     - {role: infra-role-web3signer}
 ```
+
+---
+
+### Ref
+
+- [consensy ansible web3signer](https://github.com/Consensys/ansible-role-web3signer)
+- [signers_docker_compose](https://github.com/usmansaleem/signers_docker_compose)
