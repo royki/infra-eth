@@ -129,6 +129,10 @@ services:
       --suggested-fee-recipient={{ nimbus_eth2_suggested_fee_recipient }}
       --suggested-gas-limit={{ nimbus_eth2_suggested_gas_limit }}
 {% endif %}
+
+{#
+# Validator Service
+ #}
 {% if nimbus_eth2_validator_enabled %}
   nimbus-validator:
     image: {{ nimbus_eth2_validator_image_name }}
