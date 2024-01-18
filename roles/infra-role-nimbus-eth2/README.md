@@ -6,7 +6,6 @@ Ethereum Consensus Layer node
 ## Prerequisite
 
 - docker
-- check <https://github.com/status-im/infra-role-bootstrap-linux/>
 
 ### Configuration  (To be updated)
 
@@ -18,6 +17,7 @@ eth1_jwt_secret_path: '/docker/nethermind/node/keys/jwtsecret'
 ```
 
 - Or Manually copy jwtsecret here
+  - Check Nethermind <https://docs.nethermind.io/get-started/consensus-clients/#configuring-json-rpc-interface/>
 
 ```yml
 nimbus_eth2_eth1_jwt_secret_copied: true
