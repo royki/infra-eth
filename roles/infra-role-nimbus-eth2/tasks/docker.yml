@@ -1,0 +1,18 @@
+---
+- name: Create compose file
+  template:
+    src: 'docker-compose.yml.j2'
+    dest: '{{ nimbus_eth2_compose_path }}'
+    owner: 'dockremap'
+    group: 'docker'
+    mode: 0640
+  tags: a
+
+- name: Create containers
+  docker_compose:
+    project_src: '{{ nimbus_eth2_service_path }}'
+    state: '{{ compose_state }}'
+    restarted: '{{ compose_restart }}'
+    recreate: '{{ compose_recreate | default("smart") }}'
+    pull: true
+    build: false

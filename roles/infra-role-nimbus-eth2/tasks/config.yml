@@ -1,0 +1,41 @@
+---
+- name: Create container directories
+  file:
+    path: '{{ item }}'
+    owner: dockremap
+    group: docker
+    state: directory
+    mode: 0700
+  with_items:
+    - '{{ nimbus_eth2_service_path }}'
+    - '{{ nimbus_eth2_secrets_dir }}'
+    - '{{ nimbus_eth2_validators_dir }}'
+    - '{{ nimbus_eth2_era_dir }}'
+
+- name: Create netkey file
+  when: nimbus_eth2_netkey_enabled
+  copy:
+    dest:    '{{ nimbus_eth2_netkey_file }}'
+    content: '{{ nimbus_eth2_netkey }}'
+    owner:   dockremap
+    group:   docker
+    mode:    0600
+
+- name: Copy JWT secret file
+  when: nimbus_eth2_eth1_jwt_secret_enabled
+  copy:
+    dest:    '{{ nimbus_eth2_eth1_jwt_secret_path }}'
+    src:     '{{ eth1_jwt_secret_path }}'
+    owner:   dockremap
+    group:   docker
+    mode:    0400
+    remote_src: yes
+
+- name: Copy content of JWT secret file
+  when: nimbus_eth2_eth1_jwt_secret_copied
+  copy:
+    dest:    '{{ nimbus_eth2_eth1_jwt_secret_path }}'
+    content: '{{ eth1_jwt_secret }}'
+    owner:   dockremap
+    group:   docker
+    mode:    0400
